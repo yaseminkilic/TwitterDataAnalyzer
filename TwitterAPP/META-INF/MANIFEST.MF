@@ -1,0 +1,16 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: TwitterAPP
+Bundle-SymbolicName: TwitterAPP
+Bundle-Version: 1.0.0.qualifier
+Bundle-ClassPath: TwitterAPP.jar,
+ lib/twitter4j-core-4.0.4.jar
+Export-Package: .,
+ twitter4j,
+ twitter4j.api,
+ twitter4j.auth,
+ twitter4j.conf,
+ twitter4j.json,
+ twitter4j.management,
+ twitter4j.util,
+ twitter4j.util.function
