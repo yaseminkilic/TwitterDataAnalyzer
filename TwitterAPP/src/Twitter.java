@@ -7,7 +7,6 @@ public class Twitter {
 	String text;
 	String name;
 	
-	
 	public Twitter(long id,String name,String text,Date date){
 		this.id = id;
 		this.name = name;

@@ -14,7 +14,6 @@ public class Main {
 	private static String accessToken;
 	private static String accessSecret;
 	
-	
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		
