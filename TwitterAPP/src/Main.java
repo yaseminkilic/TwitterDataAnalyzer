@@ -10,16 +10,39 @@ import twitter4j.TwitterFactory;
 import twitter4j.conf.ConfigurationBuilder;
 
 public class Main {
-
+	
+	private static String accessToken;
+	private static String accessSecret;
+	
 	
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-
+		
 		ConfigurationBuilder cb = new ConfigurationBuilder();
-		cb.setDebugEnabled(true).setOAuthConsumerKey("58ima3mcngzPCv0KnGwCVPllc")
-				.setOAuthConsumerSecret("NVnV0RCstWEiRxGq5VcQloHEfgEpxsiSNcD8KFGrjcV4hQRyXA")
-				.setOAuthAccessToken("1830753932-3JaV7m18EEpkfFbabLSXhmNkjtueVvzzdclFEse")
-				.setOAuthAccessTokenSecret("NUIcsvmBisuuEe26AWzCsRKKC2h5v7oRTek1paNdGyXfk");
+		
+		if(args.length < 2){ System.out.println("Error! There isn't an usuable OAuthConsumerKey/Secret!!!"); System.exit(0); }
+
+		AuthenticationData oauth = new AuthenticationData(args[0], args[1]);
+		
+		// There isn't a OAuthConsumerSecret and secret
+		if(args.length <= 2){
+			String[] access = oauth.getAccessToken();
+			if(access.length < 2){ System.out.println("Error! There isn't an usuable OAuthAccessToken/Secret!!!"); System.exit(0); }
+			
+			accessToken = access[0];
+			accessSecret = access[1];
+		}
+		else{
+			accessToken = args[2];
+			accessSecret = args[3];
+		}
+		
+		cb.setDebugEnabled(true)
+		  .setOAuthConsumerKey(args[0])
+		  .setOAuthConsumerSecret(args[1])
+		  .setOAuthAccessToken(accessToken)
+		  .setOAuthAccessTokenSecret(accessSecret);
+		
 		TwitterFactory tf = new TwitterFactory(cb.build());
 
 		// The factory instance is re-useable and thread safe.
