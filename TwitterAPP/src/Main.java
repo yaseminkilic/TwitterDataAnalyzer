@@ -54,6 +54,7 @@ public class Main {
 		for (Twitter t : tweet) {
 			System.out.println("*** " + t.id + "\n\t--- " + t.name + "\n\t--- " + t.text + "\n\t--- " + t.date);
 		}
+		
 		System.out.println("Total: " + statuses.size());
 	}
 
