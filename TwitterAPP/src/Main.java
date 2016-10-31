@@ -55,6 +55,7 @@ public class Main {
 			int numberOfTweets = 100000, tweetsize=0;
 			ArrayList<Status> tweets = new ArrayList<Status>();
 			
+			
 			twitter4j.Twitter twitter = new TwitterFactory(cb.build()).getInstance();
 			Query query = new Query("cyberSecurity");
 			
