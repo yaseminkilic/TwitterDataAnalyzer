@@ -1,9 +1,16 @@
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
+import twitter4j.GeoLocation;
 import twitter4j.Paging;
+import twitter4j.Query;
+import twitter4j.QueryResult;
 import twitter4j.Status;
 import twitter4j.TwitterException;
 import twitter4j.TwitterFactory;
@@ -42,43 +49,72 @@ public class Main {
 		  .setOAuthAccessToken(accessToken)
 		  .setOAuthAccessTokenSecret(accessSecret);
 		
-		TwitterFactory tf = new TwitterFactory(cb.build());
+		try {
 
-		// The factory instance is re-useable and thread safe.
-		twitter4j.Twitter twitter = tf.getInstance();
+			long lastID = Long.MAX_VALUE;
+			int numberOfTweets = 100000, tweetsize=0;
+			ArrayList<Status> tweets = new ArrayList<Status>();
+			
+			twitter4j.Twitter twitter = new TwitterFactory(cb.build()).getInstance();
+			Query query = new Query("cyberSecurity");
+			
+			while (tweets.size () < numberOfTweets) {
+				
+			    if (numberOfTweets - tweets.size() > 100)
+			    	query.setCount(100);
+			    else 
+			    	query.setCount(numberOfTweets - tweets.size());
+			    
+			    QueryResult result = twitter.search(query);
+			    tweetsize = tweets.size();
+			    tweets.addAll(result.getTweets());
+			    
+			    if(tweetsize == tweets.size())
+			    	break;
+			    
+			    System.out.println("Gathered " + tweets.size() + " tweets");
+			    for (Status t: tweets) 
+			    	if(t.getId() < lastID) lastID = t.getId();
 
-		int pageno = 1;
-		String user = "google";
-		List statuses = new ArrayList();
+			    query.setMaxId(lastID-1);
+			  }
+			
+			  File file = new File("dosya1.txt");
+			  if (!file.exists()) {
+				  file.createNewFile();
+			  }
+	
+			  FileWriter fileWriter = new FileWriter(file, false);
+			  BufferedWriter bWriter = new BufferedWriter(fileWriter);
+			  
+			  String user, msg, time;
+			  for (int i = 0; i < tweets.size(); i++) {
+				  Status t = (Status) tweets.get(i);
+				  GeoLocation loc = t.getGeoLocation();
 
-		while (true) {
+				  user = t.getUser().getScreenName();
+				  msg = t.getText();
+				  time = "";
+				  
+				  if (loc!=null) {
+					  Double lat = t.getGeoLocation().getLatitude();
+					  Double lon = t.getGeoLocation().getLongitude();
+					  System.out.println(i + " USER: " + user + " wrote: " + msg + " located at " + lat + ", " + lon);
 
-			try {
+					  bWriter.write(i + " USER: " + user + " wrote: " + msg + " located at " + lat + ", " + lon);
+					  bWriter.write(" ");
 
-				int size = statuses.size();
-				Paging page = new Paging(pageno++, 100);
-				statuses.addAll(twitter.getUserTimeline(user, page));
-				if (statuses.size() == size)
-					break;
-			} catch (TwitterException e) {
-				e.printStackTrace();
-			}
+				  } 
+				  else {
+					  System.out.println(i + " USER: " + user + " wrote: " + msg);
+					  bWriter.write(i + " USER: " + user + " wrote: " + msg);
+					  bWriter.write(" ");
+				  }
+			  }
 		}
-		List<Twitter> tweet = new ArrayList();
-
-		for (int j = 0; j < statuses.size(); j++) {
-			Status st = (Status) statuses.get(j);
-			String[] a=st.getText().split("http");
-			String[] b=a[0].split(" ",2);
-			tweet.add(new Twitter(st.getId(), st.getInReplyToScreenName(), b[1], st.getCreatedAt()));
-
-		}
-
-		for (Twitter t : tweet) {
-			System.out.println("*** " + t.id + "\n\t--- " + t.name + "\n\t--- " + t.text + "\n\t--- " + t.date);
-		}
-		
-		System.out.println("Total: " + statuses.size());
+	    catch (TwitterException | IOException te) {
+	    	System.out.println("Couldn't connect: " + te);
+	    }; 
 	}
 
 }
