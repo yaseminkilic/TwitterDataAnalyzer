@@ -4,8 +4,11 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Array;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.mysql.jdbc.Connection;
 
 import twitter4j.GeoLocation;
 import twitter4j.Paging;
@@ -24,32 +27,36 @@ public class Main {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		
-		ConfigurationBuilder cb = new ConfigurationBuilder();
-		
-		if(args.length < 2){ System.out.println("Error! There isn't an usuable OAuthConsumerKey/Secret!!!"); System.exit(0); }
-
-		AuthenticationData oauth = new AuthenticationData(args[0], args[1]);
-		
-		// There isn't a OAuthConsumerSecret and secret
-		if(args.length <= 2){
-			String[] access = oauth.getAccessToken();
-			if(access.length < 2){ System.out.println("Error! There isn't an usuable OAuthAccessToken/Secret!!!"); System.exit(0); }
-			
-			accessToken = access[0];
-			accessSecret = access[1];
-		}
-		else{
-			accessToken = args[2];
-			accessSecret = args[3];
-		}
-		
-		cb.setDebugEnabled(true)
-		  .setOAuthConsumerKey(args[0])
-		  .setOAuthConsumerSecret(args[1])
-		  .setOAuthAccessToken(accessToken)
-		  .setOAuthAccessTokenSecret(accessSecret);
+		Connection connection = null;
+		DbConnection db = new DbConnection();
 		
 		try {
+			connection = db.openDb();
+			//db.createQuery("Select * from tweets", connection);
+			
+			ConfigurationBuilder cb = new ConfigurationBuilder();
+			if(args.length < 2){ System.out.println("Error! There isn't an usuable OAuthConsumerKey/Secret!!!"); System.exit(0); }
+			AuthenticationData oauth = new AuthenticationData(args[0], args[1]);
+			
+			// There isn't a OAuthConsumerSecret and secret
+			if(args.length <= 2){
+				String[] access = oauth.getAccessToken();
+				if(access.length < 2){ System.out.println("Error! There isn't an usuable OAuthAccessToken/Secret!!!"); System.exit(0); }
+				
+				accessToken = access[0];
+				accessSecret = access[1];
+			}
+			else{
+				accessToken = args[2];
+				accessSecret = args[3];
+			}
+			
+			cb.setDebugEnabled(true)
+			  .setOAuthConsumerKey(args[0])
+			  .setOAuthConsumerSecret(args[1])
+			  .setOAuthAccessToken(accessToken)
+			  .setOAuthAccessTokenSecret(accessSecret);
+			
 
 			long lastID = Long.MAX_VALUE;
 			int numberOfTweets = 100000, tweetsize=0;
@@ -111,10 +118,22 @@ public class Main {
 					  bWriter.write(" ");
 				  }
 			  }
-		}
-	    catch (TwitterException | IOException te) {
+		} catch (TwitterException | IOException te) {
 	    	System.out.println("Couldn't connect: " + te);
-	    }; 
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		finally{
+			try {
+				db.closeDb(connection);
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 	}
-
 }
