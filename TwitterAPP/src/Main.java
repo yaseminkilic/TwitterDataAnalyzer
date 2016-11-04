@@ -30,6 +30,7 @@ public class Main {
 		Connection connection = null;
 		DbConnection db = new DbConnection();
 		
+		
 		try {
 			connection = db.openDb();
 			//db.createQuery("Select * from tweets", connection);
