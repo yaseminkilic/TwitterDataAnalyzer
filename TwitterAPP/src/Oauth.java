@@ -1,14 +1,14 @@
 
 class Oauth {
 
-	private static String consumerKey;
-	private static String consumerSecret;
+	
+	private static String consumerKey ;
+	private static String consumerSecret ;
 	
 	Oauth(String key, String secret){
 		consumerKey = key;
 		consumerSecret = secret;
 	}
-	
 	
 	public static String getConsumerKey() {
 		return consumerKey;
