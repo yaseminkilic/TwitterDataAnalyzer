@@ -5,7 +5,6 @@ import com.mysql.jdbc.Statement;
 
 class DbConnection {
 	
-	
 	Connection openDb() throws ClassNotFoundException, SQLException{
 		Class.forName("com.mysql.jdbc.Connection");
 		return (Connection)DriverManager.getConnection("jdbc:mysql://localhost:3306/mysql","root","12345678");
