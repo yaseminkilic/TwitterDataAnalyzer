@@ -1,6 +1,6 @@
 import java.util.Date;
 
-public class Twitter {
+class Twitter {
 	
 	Date date;
 	long id;
@@ -41,8 +41,8 @@ public class Twitter {
 	public String getName() {
 		return name;
 	}
+	
 	public void setName(String name) {
 		this.name = name;
 	}
-	
 }

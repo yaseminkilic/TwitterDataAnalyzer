@@ -5,7 +5,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
-
 import twitter4j.GeoLocation;
 import twitter4j.Query;
 import twitter4j.QueryResult;
@@ -13,7 +12,6 @@ import twitter4j.Status;
 import twitter4j.TwitterException;
 import twitter4j.TwitterFactory;
 import twitter4j.conf.ConfigurationBuilder;
-
 import com.mysql.jdbc.Connection;
 
 public class Main {
@@ -26,7 +24,6 @@ public class Main {
 		
 		Connection connection = null;
 		DbConnection db = new DbConnection();
-		
 		
 		try {
 			

@@ -1,6 +1,7 @@
 
 class Oauth {
 
+	
 	private static String consumerKey ;
 	private static String consumerSecret ;
 	
@@ -8,7 +9,6 @@ class Oauth {
 		consumerKey = key;
 		consumerSecret = secret;
 	}
-	
 	
 	public static String getConsumerKey() {
 		return consumerKey;

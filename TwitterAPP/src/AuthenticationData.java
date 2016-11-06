@@ -19,11 +19,9 @@ import twitter4j.auth.RequestToken;
 class AuthenticationData {
 	
 	Oauth oauth;
-	
 	AuthenticationData (String key, String secret){
 		oauth = new Oauth(key, secret);
 	}
-	
 	
 	public String[] getAccessToken() {
 		
