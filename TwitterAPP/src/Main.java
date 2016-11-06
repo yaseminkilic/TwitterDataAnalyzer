@@ -14,7 +14,9 @@ import twitter4j.TwitterFactory;
 import twitter4j.conf.ConfigurationBuilder;
 import com.mysql.jdbc.Connection;
 
+
 public class Main {
+	
 	
 	private static String accessToken;
 	private static String accessSecret;
