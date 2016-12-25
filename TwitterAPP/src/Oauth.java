@@ -1,29 +1,27 @@
 
 class Oauth {
 
-	
-	private static String consumerKey ;
-	private static String consumerSecret ;
+	private String consumerKey;
+	private String consumerSecret;
 	
 	Oauth(String key, String secret){
 		consumerKey = key;
 		consumerSecret = secret;
 	}
 	
-	public static String getConsumerKey() {
+	public String getConsumerKey() {
 		return consumerKey;
 	}
 	
-	public static void setConsumerKey(String consumerKey) {
-		Oauth.consumerKey = consumerKey;
+	void setConsumerKey(String key) {
+		consumerKey = key;
 	}
 	
-	public static String getConsumerSecret() {
+	public String getConsumerSecret() {
 		return consumerSecret;
 	}
 	
-	public static void setConsumerSecret(String consumerSecret) {
-		Oauth.consumerSecret = consumerSecret;
+	void setConsumerSecret(String secret) {
+		consumerSecret = secret;
 	}
-	
 }

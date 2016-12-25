@@ -1,11 +1,11 @@
 import java.util.Date;
 
-class Twitter {
+public class Twitter {
 	
-	Date date;
-	long id;
-	String text;
-	String name;
+	private Date date;
+	private long id;
+	private String text;
+	private String name;
 	
 	public Twitter(long id,String name,String text,Date date){
 		this.id = id;
@@ -18,7 +18,7 @@ class Twitter {
 		return date;
 	}
 	
-	public void setDate(Date date) {
+	void setDate(Date date) {
 		this.date = date;
 	}
 	
@@ -26,7 +26,7 @@ class Twitter {
 		return id;
 	}
 	
-	public void setId(long id) {
+	void setId(long id) {
 		this.id = id;
 	}
 	
@@ -34,7 +34,7 @@ class Twitter {
 		return text;
 	}
 	
-	public void setText(String text) {
+	void setText(String text) {
 		this.text = text;
 	}
 	
@@ -42,7 +42,7 @@ class Twitter {
 		return name;
 	}
 	
-	public void setName(String name) {
+	void setName(String name) {
 		this.name = name;
 	}
 }

@@ -1,136 +1,85 @@
-
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.sql.Date;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import twitter4j.GeoLocation;
+
 import twitter4j.Query;
 import twitter4j.QueryResult;
 import twitter4j.Status;
 import twitter4j.TwitterException;
-import twitter4j.TwitterFactory;
-import twitter4j.conf.ConfigurationBuilder;
-import com.mysql.jdbc.Connection;
 
+public class Main extends Thread{
 
-public class Main {
-	
-	
-	private static String accessToken;
-	private static String accessSecret;
-	
+	private static DbConnection dbConn;
+
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-		
-		Connection connection = null;
-		DbConnection db = new DbConnection();
+		String queryString = "";
+		ArrayList<String> list;
 		
 		try {
+			dbConn = new DbConnection(args);
+			twitter4j.Twitter twitter = dbConn.getTwitter();
 			
-			connection = db.openDb();
-			//db.createQuery("Select * from tweets", connection);
-			
-			ConfigurationBuilder cb = new ConfigurationBuilder();
-			if(args.length < 2){ System.out.println("Error! There isn't an usuable OAuthConsumerKey/Secret!!!"); System.exit(0); }
-			AuthenticationData oauth = new AuthenticationData(args[0], args[1]);
-			
-			// There isn't a OAuthConsumerSecret and secret
-			if(args.length <= 2){
-				String[] access = oauth.getAccessToken();
-				if(access.length < 2){ System.out.println("Error! There isn't an usuable OAuthAccessToken/Secret!!!"); System.exit(0); }
-				
-				accessToken = access[0];
-				accessSecret = access[1];
-			}
-			else{
-				accessToken = args[2];
-				accessSecret = args[3];
+			if((queryString = dbConn.createQuery()).isEmpty()){
+				System.out.println("There is not any term in terms table");
+				System.exit(0);
 			}
 			
-			cb.setDebugEnabled(true)
-			  .setOAuthConsumerKey(args[0])
-			  .setOAuthConsumerSecret(args[1])
-			  .setOAuthAccessToken(accessToken)
-			  .setOAuthAccessTokenSecret(accessSecret);
-			
+			Query query = new Query(queryString);
 
-			long lastID = Long.MAX_VALUE;
-			int numberOfTweets = 100000, tweetsize=0;
-			ArrayList<Status> tweets = new ArrayList<Status>();
-			
-			twitter4j.Twitter twitter = new TwitterFactory(cb.build()).getInstance();
-			Query query = new Query("cyberSecurity");
-			
-			while (tweets.size () < numberOfTweets) {
+			QueryResult result = twitter.search(query);
+			while (true) {
+				query.setCount(100);
+
+				if(result.getRateLimitStatus().getSecondsUntilReset() == 0){
+				   try {
+					   Thread.sleep(result.getRateLimitStatus().getSecondsUntilReset()*1000);
+					   result = twitter.search(query);
+				   } catch (InterruptedException e) {
+					   // TODO Auto-generated catch block
+					   e.printStackTrace();
+				   }
+				}
 				
-			    if (numberOfTweets - tweets.size() > 100)
-			    	query.setCount(100);
-			    else 
-			    	query.setCount(numberOfTweets - tweets.size());
-			    
-			    QueryResult result = twitter.search(query);
-			    tweetsize = tweets.size();
-			    tweets.addAll(result.getTweets());
-			    
-			    if(tweetsize == tweets.size())
-			    	break;
-			    
-			    System.out.println("Gathered " + tweets.size() + " tweets");
-			    for (Status t: tweets) 
-			    	if(t.getId() < lastID) lastID = t.getId();
+				Date time;
+				String msg;
+				int userid, tweetid, termid;
+				boolean state = false;
+				for (Status status : result.getTweets()) {
+					userid = (int) status.getUser().getId();
+					tweetid = (int) status.getId();
+					msg = status.getText();
+					time = new java.sql.Date(status.getCreatedAt().getTime());
+					
+					state = dbConn.insertTweet(userid, tweetid, msg, time);
+					if(!state) continue;
+					
+					list = dbConn.getTerm();
+					System.out.println(query);
+					System.out.println("---> " + "userid : " + userid + " tweetid : " + tweetid + " msg : " + msg + " time : " + time);
+					for (int j = 0; j < list.size(); j++) {
+						if (state && status.getText().toLowerCase().contains(list.get(j).toLowerCase())) {
+							termid = dbConn.findId(list.get(j));
+							PreparedStatement preparedStatement = dbConn.getConn().prepareStatement("INSERT INTO tweetandterm (tweetid, termid) values (?, ?)");
+							preparedStatement.setLong(1, tweetid);
+							preparedStatement.setLong(2, termid);
+							preparedStatement.executeUpdate();	
+						}
+					}
+				}
 
-			    query.setMaxId(lastID-1);
-			  }
-			
-			  File file = new File("dosya1.txt");
-			  if (!file.exists()) {
-				  file.createNewFile();
-			  }
-	
-			  FileWriter fileWriter = new FileWriter(file, false);
-			  BufferedWriter bWriter = new BufferedWriter(fileWriter);
-			  
-			  String user, msg, time;
-			  for (int i = 0; i < tweets.size(); i++) {
-				  Status t = (Status) tweets.get(i);
-				  GeoLocation loc = t.getGeoLocation();
+				result = twitter.search(query);
+			}
 
-				  user = t.getUser().getScreenName();
-				  msg = t.getText();
-				  time = "";
-				  
-				  if (loc!=null) {
-					  Double lat = t.getGeoLocation().getLatitude();
-					  Double lon = t.getGeoLocation().getLongitude();
-					  System.out.println(i + " USER: " + user + " wrote: " + msg + " located at " + lat + ", " + lon);
-
-					  bWriter.write(i + " USER: " + user + " wrote: " + msg + " located at " + lat + ", " + lon);
-					  bWriter.write(" ");
-
-				  } 
-				  else {
-					  System.out.println(i + " USER: " + user + " wrote: " + msg);
-					  bWriter.write(i + " USER: " + user + " wrote: " + msg);
-					  bWriter.write(" ");
-				  }
-			  }
-		} catch (TwitterException | IOException te) {
-	    	System.out.println("Couldn't connect: " + te);
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		finally{
+		} catch (TwitterException e) {
+			//System.out.println("TwitterException : " + e);
+		} catch (ClassNotFoundException | SQLException e) {
+			//System.out.println("ClassNotFoundException/SQLException : " + e);
+		} finally {
 			try {
-				db.closeDb(connection);
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				dbConn.closeDb();
+			} catch (ClassNotFoundException | SQLException e) {
+				//System.out.println("ClassNotFoundException/SQLException : " + e);
 			}
 		}
 	}

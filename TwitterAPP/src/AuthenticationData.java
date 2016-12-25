@@ -1,6 +1,5 @@
 import java.awt.Desktop;
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,10 +14,10 @@ import twitter4j.TwitterFactory;
 import twitter4j.auth.AccessToken;
 import twitter4j.auth.RequestToken;
 
-
 class AuthenticationData {
 	
-	Oauth oauth;
+	private Oauth oauth;
+	
 	AuthenticationData (String key, String secret){
 		oauth = new Oauth(key, secret);
 	}
@@ -28,7 +27,6 @@ class AuthenticationData {
 		String key = oauth.getConsumerKey();
 		String secret = oauth.getConsumerSecret();
 		
-        File file = new File("twitter4j.properties");
         Properties prop = new Properties();
         InputStream is = null;
         OutputStream os = null;
