@@ -19,7 +19,7 @@ public class Main extends Thread{
 			twProcess = TwitterProccess.authenticate(args);
 			dbConn = TwitterProccess.conn;
 			twitter = twProcess.getTwitter();
-			listSize = twProcess.getList();
+			listSize = twProcess.getListSize();
 			
 			if((queryString1 = twProcess.createQuery(0, 10)).isEmpty() 
 /*||(queryString2 = twProcess.createQuery(listSize/3+1, listSize*2/3)).isEmpty() 
