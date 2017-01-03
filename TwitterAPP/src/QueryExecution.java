@@ -33,7 +33,7 @@ public class QueryExecution extends Main{
 				for(int i=0; i<1/*results.length*/; i++){
 					for (Status status : results[i].getTweets()) {
 						tweetid = getTweets(status);
-						dbConn.insertTweetAndTerm(status, dbConn, tweetid);
+						dbprocess.insertTweetAndTerm(status, dbConn, tweetid);
 					}
 					results[i] = twitter.search(query[i]);
 				}
@@ -56,10 +56,10 @@ public class QueryExecution extends Main{
 		int tweetid = (int) status.getId();
 		String msg = status.getText();
 		Date time = new java.sql.Date(status.getCreatedAt().getTime());
-		boolean state = dbConn.insertTweet("OriginalTweets", userid, tweetid, msg, time);
+		boolean state = dbprocess.insertTweet("OriginalTweets", userid, tweetid, msg, time);
 		if(!state) return 0;
 		
-		list = dbConn.getTerm();
+		list = dbprocess.getTerm();
 		System.out.println("---> " + "userid : " + userid + " tweetid : " + tweetid + " msg : " + msg + " time : " + time);
 		return tweetid;
 	}
