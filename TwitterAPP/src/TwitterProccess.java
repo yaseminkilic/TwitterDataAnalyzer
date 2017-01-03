@@ -8,6 +8,7 @@ import twitter4j.Twitter;
 public class TwitterProccess {
 	private static TwitterProccess twProcess = null;
 	protected static DbConnection conn = new DbConnection();
+	protected static DbProcess dbprocess = new DbProcess();
 	private Twitter twitter = null;
 	private ArrayList<String> list;
 
@@ -42,7 +43,7 @@ public class TwitterProccess {
 	}
 
 	
-	public int getListSize() { return (list = conn.getTerm()).size(); }
+	public int getListSize() { return (list = dbprocess.getTerm()).size(); }
 	public twitter4j.Twitter getTwitter() {  return twitter;  }
 	void setTwitter(String consumerKey, String consumerSecret, String accessToken, String accessTokenSecret) throws ClassNotFoundException, SQLException {
 		ConfigurationBuilder cb = new ConfigurationBuilder();
