@@ -8,6 +8,7 @@ import twitter4j.Twitter;
 public class TwitterProccess {
 	private static TwitterProccess twProcess = null;
 	protected static DbConnection conn = new DbConnection();
+	protected static DbProcess dbprocess = new DbProcess();
 	private Twitter twitter = null;
 	private ArrayList<String> list;
 
@@ -42,7 +43,7 @@ public class TwitterProccess {
 	}
 
 	
-	public int getListSize() { return (list = conn.getTerm()).size(); }
+	public int getListSize() { return (list = dbprocess.getTerm()).size(); }
 	public twitter4j.Twitter getTwitter() {  return twitter;  }
 	void setTwitter(String consumerKey, String consumerSecret, String accessToken, String accessTokenSecret) throws ClassNotFoundException, SQLException {
 		ConfigurationBuilder cb = new ConfigurationBuilder();
@@ -65,7 +66,7 @@ public class TwitterProccess {
 				break;
 			}
 		}
-		query="("+query+") AND"+" (turkey OR türkiye OR turkiye)";
+		query="("+query+") AND"+" (turkey OR tÃ¼rkiye OR turkiye)";
 		System.out.println(query);
 		return query;
 	}
@@ -85,7 +86,7 @@ public class TwitterProccess {
 				break;
 			}
 		}
-		query="("+query+") AND"+" (turkey OR türkiye OR turkiye)";
+		query="("+query+") AND"+" (turkey OR tÃ¼rkiye OR turkiye)";
 		System.out.println(query);
 		return query;
 	}
@@ -104,7 +105,7 @@ public class TwitterProccess {
 				break;
 			}
 		}
-		query1="("+query1+") AND"+" (turkey OR türkiye OR turkiye)";
+		query1="("+query1+") AND"+" (turkey OR tÃ¼rkiye OR turkiye)";
 		System.out.println(query1);
 		return query1;
 	}
@@ -123,7 +124,7 @@ public class TwitterProccess {
 				break;
 			}
 		}
-		query3="("+query3+") AND"+" (turkey OR türkiye OR turkiye)";
+		query3="("+query3+") AND"+" (turkey OR tÃ¼rkiye OR turkiye)";
 		System.out.println(query3);
 		return query3;
 	}
