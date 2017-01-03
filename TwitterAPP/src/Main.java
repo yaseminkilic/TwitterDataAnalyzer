@@ -8,6 +8,7 @@ public class Main extends Thread{
 
 	protected static DbConnection dbConn = null;
 	protected static TwitterProccess twProcess = null;
+	protected static DbProcess dbprocess = new DbProcess();
 	protected static ArrayList<String> list = null;
 	protected static Query query[] = new Query[3];
 	protected static Twitter twitter = null;
