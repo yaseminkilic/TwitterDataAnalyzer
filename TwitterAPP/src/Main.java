@@ -1,86 +1,41 @@
-import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+
 import java.util.ArrayList;
 
 import twitter4j.Query;
-import twitter4j.QueryResult;
-import twitter4j.Status;
-import twitter4j.TwitterException;
+import twitter4j.Twitter;
 
 public class Main extends Thread{
 
-	private static DbConnection dbConn;
-
+	protected static DbConnection dbConn = null;
+	protected static TwitterProccess twProcess = null;
+	protected static ArrayList<String> list = null;
+	protected static Query query[] = new Query[3];
+	protected static Twitter twitter = null;
+	
 	public static void main(String[] args) {
-		String queryString = "";
-		ArrayList<String> list;
-		
+		String queryString1 = "", queryString2 = "", queryString3 = "";
+		int listSize = 0;
 		try {
-			dbConn = new DbConnection(args);
-			twitter4j.Twitter twitter = dbConn.getTwitter();
+			twProcess = TwitterProccess.authenticate(args);
+			dbConn = TwitterProccess.conn;
+			twitter = twProcess.getTwitter();
+			listSize = twProcess.getList();
 			
-			if((queryString = dbConn.createQuery()).isEmpty()){
+			if((queryString1 = twProcess.createQuery(0, 10)).isEmpty() 
+/*||(queryString2 = twProcess.createQuery(listSize/3+1, listSize*2/3)).isEmpty() 
+|| (queryString3 = twProcess.createQuery(listSize*2/3+1, listSize)).isEmpty()*/
+					){
 				System.out.println("There is not any term in terms table");
 				System.exit(0);
 			}
 			
-			Query query = new Query(queryString);
-
-			QueryResult result = twitter.search(query);
-			while (true) {
-				query.setCount(100);
-
-				if(result.getRateLimitStatus().getSecondsUntilReset() == 0){
-				   try {
-					   Thread.sleep(result.getRateLimitStatus().getSecondsUntilReset()*1000);
-					   result = twitter.search(query);
-				   } catch (InterruptedException e) {
-					   // TODO Auto-generated catch block
-					   e.printStackTrace();
-				   }
-				}
-				
-				Date time;
-				String msg;
-				int userid, tweetid, termid;
-				boolean state = false;
-				for (Status status : result.getTweets()) {
-					userid = (int) status.getUser().getId();
-					tweetid = (int) status.getId();
-					msg = status.getText();
-					time = new java.sql.Date(status.getCreatedAt().getTime());
-					
-					state = dbConn.insertTweet(userid, tweetid, msg, time);
-					if(!state) continue;
-					
-					list = dbConn.getTerm();
-					System.out.println(query);
-					System.out.println("---> " + "userid : " + userid + " tweetid : " + tweetid + " msg : " + msg + " time : " + time);
-					for (int j = 0; j < list.size(); j++) {
-						if (state && status.getText().toLowerCase().contains(list.get(j).toLowerCase())) {
-							termid = dbConn.findId(list.get(j));
-							PreparedStatement preparedStatement = dbConn.getConn().prepareStatement("INSERT INTO tweetandterm (tweetid, termid) values (?, ?)");
-							preparedStatement.setLong(1, tweetid);
-							preparedStatement.setLong(2, termid);
-							preparedStatement.executeUpdate();	
-						}
-					}
-				}
-
-				result = twitter.search(query);
-			}
-
-		} catch (TwitterException e) {
-			//System.out.println("TwitterException : " + e);
-		} catch (ClassNotFoundException | SQLException e) {
-			//System.out.println("ClassNotFoundException/SQLException : " + e);
-		} finally {
-			try {
-				dbConn.closeDb();
-			} catch (ClassNotFoundException | SQLException e) {
-				//System.out.println("ClassNotFoundException/SQLException : " + e);
-			}
+			query[0] = new Query(queryString1);
+			//query[1] = new Query(queryString2);
+			//query[2] = new Query(queryString3);
+			QueryExecution qExecute = new QueryExecution();
+		}catch(Exception e){
+			e.printStackTrace();
+			System.out.println("HATA !!! Exception : " + e.getMessage());
 		}
 	}
 }
