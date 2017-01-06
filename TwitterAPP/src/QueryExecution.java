@@ -1,14 +1,18 @@
+
 import java.sql.Date;
 import java.sql.SQLException;
-
 import twitter4j.QueryResult;
 import twitter4j.Status;
 import twitter4j.TwitterException;
 
-
+/* 
+ * This class is directly related to search the data from Twitter, and insert them into database.
+ */
 public class QueryExecution extends Main{
 	
+	/* Instance to create only one execution for searching operation. */ 
 	private QueryExecution instance = null;
+	
 	QueryExecution() {
 		execute();
 	}
@@ -18,6 +22,11 @@ public class QueryExecution extends Main{
 		return instance;
 	}
 	
+	/* 
+	 * Create query to search Twitter' data.
+	 * Get the result by using getTweets() function as a QueryResult.
+	 * Insert them into some tables in the database.
+	 */
 	private void execute(){
 		QueryResult[] results = new QueryResult[3];
 		int tweetid = 0;
@@ -32,7 +41,7 @@ public class QueryExecution extends Main{
 				
 				for(int i=0; i<1/*results.length*/; i++){
 					for (Status status : results[i].getTweets()) {
-						tweetid = getTweets(status);
+						tweetid = insertOriginalTweets(status);
 						dbprocess.insertTweetAndTerm(status, dbConn, tweetid);
 					}
 					results[i] = twitter.search(query[i]);
@@ -51,7 +60,10 @@ public class QueryExecution extends Main{
 		}
 	}
 	
-	private int getTweets(Status status) throws ClassNotFoundException, SQLException{
+	/*
+	 * Insert twitter data into  OriginalTweets table.
+	 */
+	private int insertOriginalTweets(Status status) throws ClassNotFoundException, SQLException{
 		int userid = (int) status.getUser().getId();
 		int tweetid = (int) status.getId();
 		String msg = status.getText();
@@ -59,7 +71,7 @@ public class QueryExecution extends Main{
 		boolean state = dbprocess.insertTweet("OriginalTweets", userid, tweetid, msg, time);
 		if(!state) return 0;
 		
-		list = dbprocess.getTerm();
+		this.list = dbprocess.getTerm();
 		System.out.println("---> " + "userid : " + userid + " tweetid : " + tweetid + " msg : " + msg + " time : " + time);
 		return tweetid;
 	}

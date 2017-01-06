@@ -7,12 +7,21 @@ import java.util.Date;
 
 import twitter4j.Status;
 
+/* 
+ * This class is directly related to create the query for accessing database' data.
+ * We use that class for the process such as getting list of terms, finding term' id and inserting any Twitter data for our tables, 
+ */
 public class DbProcess extends DbConnection{
-
+	
+	/* Some useful variables to control class' operations and interaction with other classes. */ 
 	private ArrayList<String> list;
 
 	
-	/* Find TERM of tweet into TWITTER table */
+	/* 
+	 * Get all terms from Terms table 
+	 * 
+	 * @return ArrayList<String>
+	 */
 	ArrayList<String> getTerm() {
 		list = new ArrayList<String>();
 		try {
@@ -30,7 +39,12 @@ public class DbProcess extends DbConnection{
 		return list;
 	}
 
-	/*  Find ID of tweet into TWITTER table */
+	/*  
+	 * Find tweetID from Terms table
+	 * @parameters  String:term
+	 * 
+	 * @return integer
+	 */
 	int findId(String term) throws ClassNotFoundException, SQLException {
 		try {
 			Statement st = getConn().createStatement();
@@ -47,11 +61,17 @@ public class DbProcess extends DbConnection{
 
 		return 0;
 	}
-	
+
+	/*  
+	 * Insert tweetId and termID into Tweetandterm table if its match one of our terms.
+	 * @parameters  status:Status, dbConn:DbConnection, tweetid:integer
+	 * 
+	 * @return boolean
+	 */
 	boolean insertTweetAndTerm(Status status, DbConnection dbConn, int tweetid) throws ClassNotFoundException{
 		int termid;
 		try {
-			for (int j = 0; j < list.size(); j++) {
+			for (int j = 0; j < getTerm().size(); j++) {
 				if (status.getText().toLowerCase().contains(list.get(j).toLowerCase())) {
 						termid = findId(list.get(j));
 						PreparedStatement preparedStatement = dbConn.getConn().prepareStatement("INSERT INTO tweetandterm (tweetid, termid) values (?, ?)");
@@ -67,7 +87,12 @@ public class DbProcess extends DbConnection{
 		return false;
 	}
 
-	/* Insert tweet datas into TWEETS table  */
+	/*  
+	 * Insert tweet into table that is given as a parameter
+	 * @parameters  table:String, userid:integer, tweetid:integer, text:String, date:Date
+	 * 
+	 * @return boolean
+	 */
 	boolean insertTweet(String table, int userid, int tweetid, String text, Date date)
 			throws ClassNotFoundException, SQLException {
 		try {

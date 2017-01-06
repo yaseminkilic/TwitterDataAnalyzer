@@ -1,7 +1,11 @@
 import java.util.Date;
 
+/* 
+ * This class is directly related to use efficiently Twitter data such as date, id, text and name.
+ */
 public class Twitter {
 	
+	/* Some useful variables to control class' operations and interaction with other classes. */ 
 	private Date date;
 	private long id;
 	private String text;

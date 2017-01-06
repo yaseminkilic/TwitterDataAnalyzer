@@ -8,20 +8,34 @@ import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Properties;
-
 import twitter4j.TwitterException;
 import twitter4j.TwitterFactory;
 import twitter4j.auth.AccessToken;
 import twitter4j.auth.RequestToken;
 
+/* 
+ * This class is directly related to get OAuthConsumerKey and its secret from Twitter when there isn't a OAuthConsumerKey and its secret.
+ * ConsumerKey and its secret are required.
+ * Access token is obtained from an authorization URL that use the user's account and its password.
+ */
 class AuthenticationData {
 	
+	/* Some useful variables to control class' operations and interaction with other classes. */ 
 	private Oauth oauth;
 	
+	/*
+	 * Create a Oauth Object by using consumerKey and its secret.
+	 */
 	AuthenticationData (String key, String secret){
 		oauth = new Oauth(key, secret);
 	}
 	
+	/*
+	 * Get ConsumerKey and ConsumerSecret from Oauth class.
+	 * Create a AccessTokenKey and AccessTokenSecret by using them.
+	 * 
+	 * @return String[] that holds the AccessTokenKey and AccessTokenSecret
+	 */
 	public String[] getAccessToken() {
 		
 		String key = oauth.getConsumerKey();
